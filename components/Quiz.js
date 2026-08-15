@@ -163,8 +163,10 @@ export default function Quiz({ questions, randomOrder = false, randomOptions = f
       </div>
 
       <div className="card">
-        <div className="q-index">문제 {currentPos + 1}</div>
-        <div className="q-text">{currentQuestion.question}</div>
+        <div className="q-text">
+          <span className="q-index">{String(currentPos + 1).padStart(2, "0")}.</span>{" "}
+          {currentQuestion.question}
+        </div>
 
         <div className="options">
           {currentQuestion.options.map((opt, idx) => {

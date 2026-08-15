@@ -51,6 +51,32 @@ body {
   text-decoration: underline;
 }
 
+.quiz-header {
+  margin-bottom: 20px;
+}
+
+.quiz-header-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+}
+
+.quiz-header-row .back-link {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.quiz-header-row h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
 .type-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -189,10 +215,9 @@ body {
 }
 
 .q-index {
-  font-size: 13px;
   color: #2f6fed;
-  font-weight: 600;
-  margin-bottom: 8px;
+  font-weight: 700;
+  margin-right: 6px;
 }
 
 .q-text {

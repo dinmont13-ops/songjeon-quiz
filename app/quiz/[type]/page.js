@@ -22,16 +22,16 @@ export default async function QuizTypePage({ params, searchParams }) {
   const randomOrder = isMixed ? true : sp?.randomOrder === "1";
   const randomOptions = isMixed ? true : sp?.randomOptions === "1";
   const limit = isMixed ? MIXED_TYPE_QUESTION_COUNT : undefined;
-  const displayCount = isMixed ? Math.min(limit, pool.length) : pool.length;
 
   return (
     <main className="page">
-      <div className="header">
-        <Link href="/" className="back-link">
-          ← 메인으로
-        </Link>
-        <h1>{TYPE_LABELS[type]}</h1>
-        <p>총 {displayCount}문제 · 4지선다 객관식</p>
+      <div className="header quiz-header">
+        <div className="quiz-header-row">
+          <Link href="/" className="back-link">
+            ← 메인으로
+          </Link>
+          <h1>{TYPE_LABELS[type]}</h1>
+        </div>
       </div>
       <Quiz
         key={`${type}-${randomOrder}-${randomOptions}`}
