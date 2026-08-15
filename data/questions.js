@@ -63,16 +63,16 @@ const sampleQuestions = [
   },
 ];
 
-// A~F 유형별 문제 세트입니다.
+// A~E 유형별 문제 세트입니다. (각 유형 20문제 예정, 현재는 샘플 데이터)
 // 지금은 모든 유형이 동일한 샘플 문제를 임시로 사용하고 있습니다.
 // 각 유형별로 실제 문제 데이터를 주시면 이 파일을 유형별로 채워드립니다.
+// F형은 별도 데이터 없이, A~E 문제를 합쳐서 랜덤으로 출제합니다 (app/quiz/[type]/page.js 참고).
 const questionSets = {
   a: sampleQuestions,
   b: sampleQuestions,
   c: sampleQuestions,
   d: sampleQuestions,
   e: sampleQuestions,
-  f: sampleQuestions,
 };
 
 export const TYPE_LABELS = {
@@ -81,7 +81,10 @@ export const TYPE_LABELS = {
   c: "C형",
   d: "D형",
   e: "E형",
-  f: "F형",
+  f: "F형 (종합 랜덤)",
 };
+
+// F형이 문제를 뽑아올 최대 개수
+export const MIXED_TYPE_QUESTION_COUNT = 20;
 
 export default questionSets;

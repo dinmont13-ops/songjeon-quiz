@@ -1,109 +1,112 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { shuffleArray } from "../lib/shuffle";
 
 const LETTERS = ["A", "B", "C", "D"];
 
-function shuffledIndexes(length) {
-  const arr = Array.from({ length }, (_, i) => i);
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+// 원본 문제 배열을 받아, randomOrder/randomOptions/limit 설정에 맞춰
+// 이번 회차에 사용할 문제 목록(보기 순서까지 반영)을 만듭니다.
+function buildSession(questions, randomOrder, randomOptions, limit) {
+  let pool = questions;
+
+  if (limit && pool.length > limit) {
+    // 개수를 제한하는 경우(F형)는 항상 무작위로 추출합니다.
+    pool = shuffleArray(pool).slice(0, limit);
+  } else if (randomOrder) {
+    pool = shuffleArray(pool);
   }
-  return arr;
+
+  return pool.map((q) => {
+    let displayOptions = q.options.map((text, idx) => ({ text, idx }));
+    if (randomOptions) {
+      displayOptions = shuffleArray(displayOptions);
+    }
+    const correctIndex = displayOptions.findIndex((o) => o.idx === q.answerIndex);
+    return {
+      id: q.id,
+      question: q.question,
+      explanation: q.explanation,
+      options: displayOptions.map((o) => o.text),
+      correctIndex,
+    };
+  });
 }
 
-export default function Quiz({ questions }) {
-  const [randomOrder, setRandomOrder] = useState(false);
-  const [order, setOrder] = useState(() =>
-    Array.from({ length: questions.length }, (_, i) => i)
-  );
+export default function Quiz({ questions, randomOrder = false, randomOptions = false, limit }) {
+  const [ready, setReady] = useState(false);
+  const [sessionQuestions, setSessionQuestions] = useState([]);
+  const [answers, setAnswers] = useState([]);
   const [currentPos, setCurrentPos] = useState(0);
-  const [selected, setSelected] = useState(null);
-  const [checked, setChecked] = useState(false);
-  const [results, setResults] = useState([]); // { qId, correct }
   const [finished, setFinished] = useState(false);
 
-  const currentQuestion = useMemo(() => {
-    const qIndex = order[currentPos];
-    return questions[qIndex];
-  }, [order, currentPos, questions]);
+  useEffect(() => {
+    startSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const totalCount = questions.length;
-  const score = results.filter((r) => r.correct).length;
-
-  function restart(nextRandom = randomOrder) {
-    const nextOrder = nextRandom
-      ? shuffledIndexes(questions.length)
-      : Array.from({ length: questions.length }, (_, i) => i);
-    setOrder(nextOrder);
+  function startSession() {
+    const session = buildSession(questions, randomOrder, randomOptions, limit);
+    setSessionQuestions(session);
+    setAnswers(Array(session.length).fill(null));
     setCurrentPos(0);
-    setSelected(null);
-    setChecked(false);
-    setResults([]);
     setFinished(false);
+    setReady(true);
   }
 
-  function handleToggleRandom(e) {
-    const value = e.target.checked;
-    setRandomOrder(value);
-    restart(value);
+  if (!ready) {
+    return (
+      <div className="card">
+        <p className="option-note">문제를 준비하고 있어요…</p>
+      </div>
+    );
   }
 
-  function handleSelect(optIndex) {
-    if (checked) return;
-    setSelected(optIndex);
-  }
-
-  function handleCheck() {
-    if (selected === null) return;
-    const isCorrect = selected === currentQuestion.answerIndex;
-    setChecked(true);
-    setResults((prev) => [
-      ...prev,
-      { qId: currentQuestion.id, question: currentQuestion.question, correct: isCorrect },
-    ]);
-  }
-
-  function handleNext() {
-    if (currentPos + 1 >= totalCount) {
-      setFinished(true);
-      return;
-    }
-    setCurrentPos((p) => p + 1);
-    setSelected(null);
-    setChecked(false);
-  }
+  const total = sessionQuestions.length;
 
   if (finished) {
-    const percent = Math.round((score / totalCount) * 100);
+    const score = sessionQuestions.reduce(
+      (acc, q, idx) => acc + (answers[idx] === q.correctIndex ? 1 : 0),
+      0
+    );
+    const percent = total > 0 ? Math.round((score / total) * 100) : 0;
+
     return (
       <div className="card result-card">
         <div className="q-index">결과</div>
         <div className="result-score">
-          {score} / {totalCount}
+          {score} / {total}
         </div>
         <div className="result-sub">정답률 {percent}%</div>
 
         <div className="review-list">
-          {results.map((r, idx) => (
-            <div className="review-item" key={idx}>
-              <span>
-                Q{idx + 1}. {r.question.length > 24 ? r.question.slice(0, 24) + "…" : r.question}
-              </span>
-              <span className={`tag ${r.correct ? "ok" : "no"}`}>
-                {r.correct ? "정답" : "오답"}
-              </span>
-            </div>
-          ))}
+          {sessionQuestions.map((q, idx) => {
+            const correct = answers[idx] === q.correctIndex;
+            return (
+              <div className="review-item-detail" key={idx}>
+                <div className="review-item-head">
+                  <span>
+                    Q{idx + 1}. {q.question}
+                  </span>
+                  <span className={`tag ${correct ? "ok" : "no"}`}>{correct ? "정답" : "오답"}</span>
+                </div>
+                {!correct && (
+                  <div className="review-item-answer">
+                    <div>내 답: {answers[idx] === null ? "미응답" : q.options[answers[idx]]}</div>
+                    <div>정답: {q.options[q.correctIndex]}</div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         <div className="actions">
           <Link href="/" className="btn-secondary btn-link">
             메인으로
           </Link>
-          <button className="btn-primary" onClick={() => restart()}>
+          <button className="btn-primary" onClick={startSession}>
             다시 풀기
           </button>
         </div>
@@ -111,23 +114,44 @@ export default function Quiz({ questions }) {
     );
   }
 
+  const currentQuestion = sessionQuestions[currentPos];
+  const selected = answers[currentPos];
+  const isLast = currentPos + 1 >= total;
+
+  function handleSelect(optIndex) {
+    setAnswers((prev) => {
+      const next = [...prev];
+      next[currentPos] = optIndex;
+      return next;
+    });
+  }
+
+  function handlePrev() {
+    if (currentPos > 0) setCurrentPos((p) => p - 1);
+  }
+
+  function handleNext() {
+    if (selected === null) return;
+    if (isLast) {
+      setFinished(true);
+      return;
+    }
+    setCurrentPos((p) => p + 1);
+  }
+
   return (
     <div>
       <div className="toolbar">
-        <label>
-          <input type="checkbox" checked={randomOrder} onChange={handleToggleRandom} />
-          랜덤 출제
-        </label>
         <span>
-          진행 {currentPos + 1} / {totalCount} · 맞은 개수 {score}
+          진행 {currentPos + 1} / {total}
+        </span>
+        <span>
+          답변 완료 {answers.filter((a) => a !== null).length} / {total}
         </span>
       </div>
 
       <div className="progress-bar">
-        <div
-          className="progress-fill"
-          style={{ width: `${((currentPos + (checked ? 1 : 0)) / totalCount) * 100}%` }}
-        />
+        <div className="progress-fill" style={{ width: `${((currentPos + 1) / total) * 100}%` }} />
       </div>
 
       <div className="card">
@@ -136,13 +160,7 @@ export default function Quiz({ questions }) {
 
         <div className="options">
           {currentQuestion.options.map((opt, idx) => {
-            let cls = "option";
-            if (checked) {
-              if (idx === currentQuestion.answerIndex) cls += " correct";
-              else if (idx === selected) cls += " incorrect";
-            } else if (idx === selected) {
-              cls += " selected";
-            }
+            const cls = `option${idx === selected ? " selected" : ""}`;
             return (
               <div key={idx} className={cls} onClick={() => handleSelect(idx)}>
                 <span className="badge">{LETTERS[idx]}</span>
@@ -152,23 +170,13 @@ export default function Quiz({ questions }) {
           })}
         </div>
 
-        {checked && currentQuestion.explanation && (
-          <div className="explanation">
-            <strong>해설: </strong>
-            {currentQuestion.explanation}
-          </div>
-        )}
-
         <div className="actions">
-          {!checked ? (
-            <button className="btn-primary" onClick={handleCheck} disabled={selected === null}>
-              정답 확인
-            </button>
-          ) : (
-            <button className="btn-primary" onClick={handleNext}>
-              {currentPos + 1 >= totalCount ? "결과 보기" : "다음 문제"}
-            </button>
-          )}
+          <button className="btn-secondary" onClick={handlePrev} disabled={currentPos === 0}>
+            이전 문제
+          </button>
+          <button className="btn-primary" onClick={handleNext} disabled={selected === null}>
+            {isLast ? "제출하고 결과보기" : "다음 문제"}
+          </button>
         </div>
       </div>
     </div>
