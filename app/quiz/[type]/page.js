@@ -16,7 +16,7 @@ export default async function QuizTypePage({ params, searchParams }) {
 
   const isMixed = type === "f";
   const pool = isMixed
-    ? BASE_TYPES.flatMap((t) => questionSets[t])
+    ? BASE_TYPES.flatMap((t) => questionSets[t].map((q) => ({ ...q, sourceType: t })))
     : questionSets[type];
 
   const randomOrder = isMixed ? true : sp?.randomOrder === "1";

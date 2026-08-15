@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { shuffleArray } from "../lib/shuffle";
+import { TYPE_LABELS } from "../data/questions";
 
-const LETTERS = ["A", "B", "C", "D"];
+const LETTERS = ["①", "②", "③", "④"];
 
 // 원본 문제 배열을 받아, randomOrder/randomOptions/limit 설정에 맞춰
 // 이번 회차에 사용할 문제 목록(보기 순서까지 반영)을 만듭니다.
@@ -28,6 +29,7 @@ function buildSession(questions, randomOrder, randomOptions, limit) {
       id: q.id,
       question: q.question,
       explanation: q.explanation,
+      sourceType: q.sourceType,
       options: displayOptions.map((o) => o.text),
       correctIndex,
     };
@@ -87,7 +89,13 @@ export default function Quiz({ questions, randomOrder = false, randomOptions = f
               <div className="review-item-detail" key={idx}>
                 <div className="review-item-head">
                   <span>
-                    Q{idx + 1}. {q.question}
+                    Q{idx + 1}.{" "}
+                    {q.sourceType && (
+                      <span className="source-tag">
+                        {TYPE_LABELS[q.sourceType]} {q.id}번
+                      </span>
+                    )}
+                    {q.question}
                   </span>
                   <span className={`tag ${correct ? "ok" : "no"}`}>{correct ? "정답" : "오답"}</span>
                 </div>

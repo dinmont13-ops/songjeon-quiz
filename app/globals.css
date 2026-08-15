@@ -96,6 +96,13 @@ body {
   align-items: center;
   justify-content: center;
   text-decoration: none;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background 0.15s ease;
 }
 
 .option-panel {
@@ -382,6 +389,18 @@ button:disabled {
 
 .review-item-head span:first-child {
   line-height: 1.5;
+}
+
+.source-tag {
+  display: inline-block;
+  background: #eef3ff;
+  color: #2f6fed;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  margin-right: 6px;
+  white-space: nowrap;
 }
 
 .review-item-answer {
