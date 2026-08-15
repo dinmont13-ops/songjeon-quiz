@@ -6,6 +6,21 @@ import { shuffleArray } from "../lib/shuffle";
 import { TYPE_LABELS } from "../data/questions";
 
 const LETTERS = ["①", "②", "③", "④"];
+const REFERENCE_LABELS = ["㉮", "㉯", "㉰", "㉱", "㉲", "㉳", "㉴", "㉵"];
+
+function ReferenceBox({ items }) {
+  if (!items || items.length === 0) return null;
+  return (
+    <div className="reference-box">
+      <div className="reference-label">[보기]</div>
+      {items.map((item, idx) => (
+        <div className="reference-item" key={idx}>
+          {REFERENCE_LABELS[idx] || idx + 1} {item}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 // 원본 문제 배열을 받아, randomOrder/randomOptions/limit 설정에 맞춰
 // 이번 회차에 사용할 문제 목록(보기 순서까지 반영)을 만듭니다.
@@ -28,6 +43,7 @@ function buildSession(questions, randomOrder, randomOptions, limit) {
     return {
       id: q.id,
       question: q.question,
+      referenceList: q.referenceList,
       explanation: q.explanation,
       sourceType: q.sourceType,
       options: displayOptions.map((o) => o.text),
@@ -88,8 +104,8 @@ export default function Quiz({ questions, randomOrder = false, randomOptions = f
             return (
               <div className="review-item-detail" key={idx}>
                 <div className="review-item-head">
-                  <span>
-                    Q{idx + 1}.{" "}
+                  <span className="review-q-text">
+                    <span className="q-index">{String(idx + 1).padStart(2, "0")}.</span>{" "}
                     {q.sourceType && (
                       <span className="source-tag">
                         {TYPE_LABELS[q.sourceType]} {q.id}번
@@ -99,12 +115,11 @@ export default function Quiz({ questions, randomOrder = false, randomOptions = f
                   </span>
                   <span className={`tag ${correct ? "ok" : "no"}`}>{correct ? "정답" : "오답"}</span>
                 </div>
-                {!correct && (
-                  <div className="review-item-answer">
-                    <div>내 답: {answers[idx] === null ? "미응답" : q.options[answers[idx]]}</div>
-                    <div>정답: {q.options[q.correctIndex]}</div>
-                  </div>
-                )}
+                <ReferenceBox items={q.referenceList} />
+                <div className="review-item-answer">
+                  <div>내 답: {answers[idx] === null ? "미응답" : q.options[answers[idx]]}</div>
+                  <div>정답: {q.options[q.correctIndex]}</div>
+                </div>
               </div>
             );
           })}
@@ -167,6 +182,8 @@ export default function Quiz({ questions, randomOrder = false, randomOptions = f
           <span className="q-index">{String(currentPos + 1).padStart(2, "0")}.</span>{" "}
           {currentQuestion.question}
         </div>
+
+        <ReferenceBox items={currentQuestion.referenceList} />
 
         <div className="options">
           {currentQuestion.options.map((opt, idx) => {
