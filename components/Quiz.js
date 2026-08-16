@@ -194,7 +194,7 @@ export default function Quiz({
         <div className="options">
           {currentQuestion.options.map((opt, idx) => {
             let cls = "option";
-            if (answerMode && selected !== null) {
+            if (answerMode) {
               if (idx === currentQuestion.correctIndex) cls += " correct";
               else if (idx === selected) cls += " incorrect";
             } else if (idx === selected) {

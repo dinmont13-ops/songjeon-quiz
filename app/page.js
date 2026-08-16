@@ -89,7 +89,7 @@ export default function Home() {
                 checked={answerMode}
                 onChange={(e) => setAnswerMode(e.target.checked)}
               />
-              정답모드 (선택 즉시 정답 표시)
+              정답모드
             </label>
           </div>
           <button type="button" className="btn-primary start-btn" onClick={handleStart}>
