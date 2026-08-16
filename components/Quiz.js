@@ -99,17 +99,14 @@ export default function Quiz({
     );
     const pointsPerQuestion = 5;
     const totalScore = score * pointsPerQuestion;
-    const maxScore = total * pointsPerQuestion;
 
     return (
       <div className="card result-card">
         <div className="q-index">결과</div>
         <div className="result-score">
-          {totalScore}점 / {maxScore}점
+          {score} / {total}
         </div>
-        <div className="result-sub">
-          {score} / {total}문제 정답
-        </div>
+        <div className="result-sub">{totalScore}점</div>
 
         <div className="review-list">
           {sessionQuestions.map((q, idx) => {
