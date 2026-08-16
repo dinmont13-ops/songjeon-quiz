@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { shuffleArray } from "../lib/shuffle";
 import { TYPE_LABELS } from "../data/questions";
@@ -57,8 +58,10 @@ export default function Quiz({
   randomOrder = false,
   randomOptions = false,
   answerMode = false,
+  nextTypeHref,
   limit,
 }) {
+  const router = useRouter();
   const [ready, setReady] = useState(false);
   const [sessionQuestions, setSessionQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
@@ -162,6 +165,10 @@ export default function Quiz({
   function handleNext() {
     if (!answerMode && selected === null) return;
     if (isLast) {
+      if (answerMode && nextTypeHref) {
+        router.push(nextTypeHref);
+        return;
+      }
       setFinished(true);
       return;
     }
@@ -218,7 +225,7 @@ export default function Quiz({
             onClick={handleNext}
             disabled={!answerMode && selected === null}
           >
-            {isLast ? "제출하고 결과보기" : "다음 문제"}
+            {isLast ? (answerMode ? "다음 유형 보기" : "제출하고 결과보기") : "다음 문제"}
           </button>
         </div>
       </div>
