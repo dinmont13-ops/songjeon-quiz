@@ -97,15 +97,19 @@ export default function Quiz({
       (acc, q, idx) => acc + (answers[idx] === q.correctIndex ? 1 : 0),
       0
     );
-    const percent = total > 0 ? Math.round((score / total) * 100) : 0;
+    const pointsPerQuestion = 5;
+    const totalScore = score * pointsPerQuestion;
+    const maxScore = total * pointsPerQuestion;
 
     return (
       <div className="card result-card">
         <div className="q-index">결과</div>
         <div className="result-score">
-          {score} / {total}
+          {totalScore}점 / {maxScore}점
         </div>
-        <div className="result-sub">정답률 {percent}%</div>
+        <div className="result-sub">
+          {score} / {total}문제 정답
+        </div>
 
         <div className="review-list">
           {sessionQuestions.map((q, idx) => {
