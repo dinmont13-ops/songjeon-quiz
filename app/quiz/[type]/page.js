@@ -21,6 +21,7 @@ export default async function QuizTypePage({ params, searchParams }) {
 
   const randomOrder = isMixed ? true : sp?.randomOrder === "1";
   const randomOptions = isMixed ? true : sp?.randomOptions === "1";
+  const answerMode = sp?.answerMode === "1";
   const limit = isMixed ? MIXED_TYPE_QUESTION_COUNT : undefined;
 
   return (
@@ -34,10 +35,11 @@ export default async function QuizTypePage({ params, searchParams }) {
         </div>
       </div>
       <Quiz
-        key={`${type}-${randomOrder}-${randomOptions}`}
+        key={`${type}-${randomOrder}-${randomOptions}-${answerMode}`}
         questions={pool}
         randomOrder={randomOrder}
         randomOptions={randomOptions}
+        answerMode={answerMode}
         limit={limit}
       />
     </main>

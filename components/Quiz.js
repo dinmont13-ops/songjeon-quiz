@@ -52,7 +52,13 @@ function buildSession(questions, randomOrder, randomOptions, limit) {
   });
 }
 
-export default function Quiz({ questions, randomOrder = false, randomOptions = false, limit }) {
+export default function Quiz({
+  questions,
+  randomOrder = false,
+  randomOptions = false,
+  answerMode = false,
+  limit,
+}) {
   const [ready, setReady] = useState(false);
   const [sessionQuestions, setSessionQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
@@ -154,7 +160,7 @@ export default function Quiz({ questions, randomOrder = false, randomOptions = f
   }
 
   function handleNext() {
-    if (selected === null) return;
+    if (!answerMode && selected === null) return;
     if (isLast) {
       setFinished(true);
       return;
@@ -187,7 +193,13 @@ export default function Quiz({ questions, randomOrder = false, randomOptions = f
 
         <div className="options">
           {currentQuestion.options.map((opt, idx) => {
-            const cls = `option${idx === selected ? " selected" : ""}`;
+            let cls = "option";
+            if (answerMode && selected !== null) {
+              if (idx === currentQuestion.correctIndex) cls += " correct";
+              else if (idx === selected) cls += " incorrect";
+            } else if (idx === selected) {
+              cls += " selected";
+            }
             return (
               <div key={idx} className={cls} onClick={() => handleSelect(idx)}>
                 <span className="badge">{LETTERS[idx]}</span>
@@ -201,7 +213,11 @@ export default function Quiz({ questions, randomOrder = false, randomOptions = f
           <button className="btn-secondary" onClick={handlePrev} disabled={currentPos === 0}>
             이전 문제
           </button>
-          <button className="btn-primary" onClick={handleNext} disabled={selected === null}>
+          <button
+            className="btn-primary"
+            onClick={handleNext}
+            disabled={!answerMode && selected === null}
+          >
             {isLast ? "제출하고 결과보기" : "다음 문제"}
           </button>
         </div>

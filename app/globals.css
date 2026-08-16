@@ -1,5 +1,26 @@
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+.option,
+input[type="checkbox"] {
+  outline: none;
+}
+
+button:focus,
+a:focus,
+.option:focus {
+  outline: none;
+}
+
+button:focus-visible,
+a:focus-visible,
+.option:focus-visible {
+  outline: 2px solid #2f6fed;
+  outline-offset: 2px;
 }
 
 html,

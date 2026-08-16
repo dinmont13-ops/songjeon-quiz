@@ -10,6 +10,7 @@ export default function Home() {
   const [selected, setSelected] = useState(null);
   const [randomOrder, setRandomOrder] = useState(false);
   const [randomOptions, setRandomOptions] = useState(false);
+  const [answerMode, setAnswerMode] = useState(false);
 
   const isF = selected === "f";
 
@@ -25,6 +26,7 @@ export default function Home() {
     const params = new URLSearchParams();
     if (effectiveOrder) params.set("randomOrder", "1");
     if (effectiveOptions) params.set("randomOptions", "1");
+    if (answerMode) params.set("answerMode", "1");
     const qs = params.toString();
 
     router.push(`/quiz/${selected}${qs ? `?${qs}` : ""}`);
@@ -80,6 +82,16 @@ export default function Home() {
               </label>
             </div>
           )}
+          <div className="option-checks">
+            <label>
+              <input
+                type="checkbox"
+                checked={answerMode}
+                onChange={(e) => setAnswerMode(e.target.checked)}
+              />
+              정답모드 (선택 즉시 정답 표시)
+            </label>
+          </div>
           <button type="button" className="btn-primary start-btn" onClick={handleStart}>
             문제풀기
           </button>
