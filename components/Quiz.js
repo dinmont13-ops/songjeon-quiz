@@ -181,9 +181,11 @@ export default function Quiz({
         <span>
           진행 {currentPos + 1} / {total}
         </span>
-        <span>
-          답변 완료 {answers.filter((a) => a !== null).length} / {total}
-        </span>
+        {!answerMode && (
+          <span>
+            답변 완료 {answers.filter((a) => a !== null).length} / {total}
+          </span>
+        )}
       </div>
 
       <div className="progress-bar">
@@ -202,13 +204,16 @@ export default function Quiz({
           {currentQuestion.options.map((opt, idx) => {
             let cls = "option";
             if (answerMode) {
-              if (idx === currentQuestion.correctIndex) cls += " correct";
-              else if (idx === selected) cls += " incorrect";
+              if (idx === currentQuestion.correctIndex) cls += " correct answer-only";
             } else if (idx === selected) {
               cls += " selected";
             }
             return (
-              <div key={idx} className={cls} onClick={() => handleSelect(idx)}>
+              <div
+                key={idx}
+                className={cls}
+                onClick={answerMode ? undefined : () => handleSelect(idx)}
+              >
                 <span className="badge">{LETTERS[idx]}</span>
                 <span>{opt}</span>
               </div>

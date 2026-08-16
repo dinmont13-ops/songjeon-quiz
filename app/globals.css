@@ -296,6 +296,14 @@ body {
   border-color: #b9cdf7;
 }
 
+.option.answer-only {
+  cursor: default;
+}
+
+.option.answer-only:hover {
+  border-color: #1fab5f;
+}
+
 .option.selected {
   border-color: #2f6fed;
   background: #eef3ff;
